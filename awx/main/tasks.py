@@ -2998,6 +2998,9 @@ class AWXReceptorJob:
 
     @classmethod
     def healthcheck(cls, node):
+        # TODO: replace with call to ansible-runner task that will
+        # check capacity for us
+        # See https://github.com/ansible/awx/issues/10693
         logger.info(f'Checking capacity of execution node {node}')
         # make a private data dir and env dir
         private_data_dir = tempfile.mkdtemp(prefix='awx_heartbeat_', dir=settings.AWX_ISOLATION_BASE_PATH)
