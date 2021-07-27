@@ -436,7 +436,7 @@ class AutoscalePool(WorkerPool):
             GuidMiddleware.set_guid(body['guid'])
         try:
             # when the cluster heartbeat occurs, clean up internally
-            if isinstance(body, dict) and 'cluster_node_heartbeat' in body['task']:
+            if isinstance(body, dict) and 'cluster_node_healthcheck' in body['task']:
                 self.cleanup()
             if self.should_grow:
                 self.up()

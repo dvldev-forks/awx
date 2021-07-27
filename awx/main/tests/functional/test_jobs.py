@@ -4,7 +4,7 @@ from unittest import mock
 import json
 
 from awx.main.models import Job, Instance, JobHostSummary, InventoryUpdate, InventorySource, Project, ProjectUpdate, SystemJob, AdHocCommand
-from awx.main.tasks import cluster_node_heartbeat
+from awx.main.tasks import cluster_node_healthcheck
 from django.test.utils import override_settings
 
 
@@ -30,7 +30,7 @@ def test_job_capacity_and_with_inactive_node():
     i.enabled = False
     i.save()
     with override_settings(CLUSTER_HOST_ID=i.hostname):
-        cluster_node_heartbeat()
+        cluster_node_healthcheck()
         i = Instance.objects.get(id=i.id)
         assert i.capacity == 0
 

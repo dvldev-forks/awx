@@ -125,7 +125,7 @@ if "pytest" in sys.modules:
         }
     }
 
-CELERYBEAT_SCHEDULE['cluster_heartbeat']['schedule'] = timedelta(seconds=10)
+CELERYBEAT_SCHEDULE['cluster_healthcheck']['schedule'] = timedelta(seconds=10)
 
 CLUSTER_HOST_ID = socket.gethostname()
 

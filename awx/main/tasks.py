@@ -175,7 +175,7 @@ def dispatch_startup():
     # no-op.
     #
     apply_cluster_membership_policies()
-    cluster_node_heartbeat()
+    cluster_node_healthcheck()
     Metrics().clear_values()
 
     # Update Tower's rsyslog.conf file based on loggins settings in the db
@@ -409,8 +409,8 @@ def cleanup_execution_environment_images():
 
 
 @task(queue=get_local_queuename)
-def check_heartbeat(node):
-    AWXReceptorJob.check_heartbeat(node)
+def healthcheck(node):
+    AWXReceptorJob.healthcheck(node)
 
 
 def discover_receptor_nodes():
@@ -429,7 +429,7 @@ def discover_receptor_nodes():
             instance.capacity = 0
             instance.version = RECEPTOR_PENDING
             instance.save(update_fields=['capacity', 'version', 'modified'])
-            check_heartbeat.apply_async([hostname])
+            healthcheck.apply_async([hostname])
         else:
             last_seen = parse_date(ad['Time'])
             logger.debug("Updated tower control node '{}' last seen {}".format(hostname, last_seen))
@@ -445,11 +445,12 @@ def discover_receptor_nodes():
                 # attempt to re-establish the initial capacity and version
                 # check
                 logger.warning('Execution node attempting to rejoin as instance {}.'.format(hostname))
-                check_heartbeat.apply_async([hostname])
+                healthcheck.apply_async([hostname])
 
 
 @task(queue=get_local_queuename)
-def cluster_node_heartbeat():
+def cluster_node_healthcheck():
+    """Conducts healthchecks across all controller / execution nodes"""
     logger.debug("Cluster node heartbeat task.")
     nowtime = now()
     instance_list = list(Instance.objects.all())
@@ -2996,7 +2997,7 @@ class AWXReceptorJob:
                 receptor_ctl.simple_command(f"work release {self.unit_id}")
 
     @classmethod
-    def check_heartbeat(cls, node):  # TODO: rename most of these "heartbeat" things
+    def healthcheck(cls, node):
         logger.info(f'Checking capacity of execution node {node}')
         # make a private data dir and env dir
         private_data_dir = tempfile.mkdtemp(prefix='awx_heartbeat_', dir=settings.AWX_ISOLATION_BASE_PATH)

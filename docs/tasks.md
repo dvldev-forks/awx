@@ -18,7 +18,7 @@ In this document, we will go into a bit of detail about how and when AWX runs Py
     - AWX runs a variety of periodic tasks that clean up temporary files, and
       performs various administrative checks
     - Every node in an AWX cluster runs a periodic task that serves as
-      a heartbeat and capacity check
+      a healthcheck and capacity check
 
 
 Tasks, Queues and Workers
@@ -150,11 +150,11 @@ Task execution in AWX is based on a sophisticated system for scheduling jobs tha
 For further information regarding AWX Schedulers or Task Managers, refer to the [Task Manager Overview page](https://github.com/ansible/awx/blob/devel/docs/task_manager_system.md) of the AWX documentation.
 
 
-### Heartbeats, Capacity, and Job Reaping
+### Healthchecks, Capacity, and Job Reaping
 
-One of the most important tasks in a clustered AWX installation is the periodic heartbeat task.  This task runs periodically on _every_ node, and is used to record a heartbeat and system capacity for that node (which is used by the scheduler when determining where to place launched jobs).
+One of the most important tasks in a clustered AWX installation is the periodic healthcheck task.  This task runs periodically on _every_ node, and is used to record a healthcheck and system capacity for that node (which is used by the scheduler when determining where to place launched jobs).
 
-If a node in an AWX cluster discovers that one of its peers has not updated its heartbeat within a certain grace period, it is assumed to be offline, and its capacity is set to zero to avoid scheduling new tasks on that node. Additionally, jobs allegedly running or scheduled to run on that node are assumed to be lost, and "reaped", or marked as failed.
+If a node in an AWX cluster discovers that one of its peers has not updated its healthcheck within a certain grace period, it is assumed to be offline, and its capacity is set to zero to avoid scheduling new tasks on that node. Additionally, jobs allegedly running or scheduled to run on that node are assumed to be lost, and "reaped", or marked as failed.
 
 ## Reaping Receptor Work Units
 When an AWX job is launched via receptor, files such as status, stdin, and stdout are created in a specific receptor directory. This directory on disk is a random 8 character string, e.g. qLL2JFNT

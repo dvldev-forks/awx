@@ -423,7 +423,7 @@ os.environ.setdefault('DJANGO_LIVE_TEST_SERVER_ADDRESS', 'localhost:9013-9199')
 BROKER_URL = 'unix:///var/run/redis/redis.sock'
 CELERYBEAT_SCHEDULE = {
     'tower_scheduler': {'task': 'awx.main.tasks.awx_periodic_scheduler', 'schedule': timedelta(seconds=30), 'options': {'expires': 20}},
-    'cluster_heartbeat': {'task': 'awx.main.tasks.cluster_node_heartbeat', 'schedule': timedelta(seconds=60), 'options': {'expires': 50}},
+    'cluster_healthcheck': {'task': 'awx.main.tasks.cluster_node_healthcheck', 'schedule': timedelta(seconds=60), 'options': {'expires': 50}},
     'gather_analytics': {'task': 'awx.main.tasks.gather_analytics', 'schedule': timedelta(minutes=5)},
     'task_manager': {'task': 'awx.main.scheduler.tasks.run_task_manager', 'schedule': timedelta(seconds=20), 'options': {'expires': 20}},
     'k8s_reaper': {'task': 'awx.main.tasks.awx_k8s_reaper', 'schedule': timedelta(seconds=60), 'options': {'expires': 50}},
