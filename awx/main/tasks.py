@@ -3131,7 +3131,9 @@ class AWXReceptorJob:
             logger.debug(f'receptorctl.submit_work(node={_kw["node"]})')
         else:
             logger.debug(f'receptorctl.submit_work({work_type})')
-        result = receptor_ctl.submit_work(worktype=work_type, payload=sockout.makefile('rb'), params=self.receptor_params, **_kw)
+        result = receptor_ctl.submit_work(
+            worktype=work_type, payload=sockout.makefile('rb'), params=self.receptor_params, ttl=120, **_kw
+        )  # TODO: make ttl configurable if we decide to keep this
         self.unit_id = result['unitid']
         self.task.update_model(self.task.instance.pk, work_unit_id=result['unitid'])
 
