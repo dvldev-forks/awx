@@ -3141,7 +3141,15 @@ class AWXReceptorJob:
         if transmitter_thread.exc:
             raise transmitter_thread.exc[1].with_traceback(transmitter_thread.exc[2])
 
-        transmitter_thread.join()
+        transmitter_thread.join(60)  # TODO: if we decide to keep this timeout, consider making this an awx setting
+        # Did we timeout while transmitting the job?
+        if transmitter_thread.is_alive():
+            msg = f"Failed to transmit job {self.task.guid}"
+            if work_type == 'ansible-raise':
+                msg += f" to node {self.task.instance.execution_node}"
+            logger.exception(msg)
+            # TODO: cancel receptor work unit
+            raise RuntimeError(msg)
 
         resultsock, resultfile = receptor_ctl.get_work_results(self.unit_id, return_socket=True, return_sockfile=True)
         # Both "processor" and "cancel_watcher" are spawned in separate threads.
